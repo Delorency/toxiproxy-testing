@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  toxiproxy:
+    image: shopify/toxiproxy:latest
+    container_name: toxiproxy
+    ports:
+      - "8474:8474"
+      - "8666:8666"
+    networks:
+      - test-network
+
+  app:
+    build: .
+    container_name: go-app
+    depends_on:
+      - toxiproxy
+    environment:
+      - TOXIPROXY_HOST=toxiproxy
+      - TOXIPROXY_API_PORT=8474
+    networks:
+      - test-network
+    command: ["go", "test", "-v", "./test/..."]
+
+networks:
+  test-network:
+    driver: bridge

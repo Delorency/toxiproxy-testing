@@ -1,0 +1,32 @@
+{
+    "test_scenarios": [
+        {
+            "name": "retry_with_reset",
+            "toxic": "reset_peer",
+            "toxic_params": {"timeout": 100},
+            "pattern": "retry",
+            "expected_attempts": 3
+        },
+        {
+            "name": "circuit_breaker_with_timeout",
+            "toxic": "timeout",
+            "toxic_params": {"timeout": 100},
+            "pattern": "circuit_breaker",
+            "expected_state": "open"
+        },
+        {
+            "name": "timeout_with_latency",
+            "toxic": "latency",
+            "toxic_params": {"latency": 5000},
+            "pattern": "timeout",
+            "expected_error": "deadline_exceeded"
+        },
+        {
+            "name": "bulkhead_with_bandwidth",
+            "toxic": "bandwidth",
+            "toxic_params": {"rate": 10},
+            "pattern": "bulkhead",
+            "max_concurrent": 5
+        }
+    ]
+}

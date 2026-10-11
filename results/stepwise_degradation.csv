@@ -1,0 +1,5 @@
+step,duration_s,rps,toxic,total,success,failed,retries,p50_ms,p95_ms,p99_ms,avg_ms,cb_state
+1,10,50,-,488,488,0,0,8.0,35.0,90.0,12.2,closed
+2,20,50,latency,940,939,1,0,519.0,594.0,671.0,522.8,closed
+3,20,50,latency,1016,0,1016,0,0.0,0.0,357.0,9.8,open
+4,20,50,-,983,882,101,0,7.0,34.0,217.0,14.3,closed
