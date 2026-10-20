@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// RequestMetrics — метрики одного запроса
+// RequestMetrics - метрики одного запроса
 type RequestMetrics struct {
 	Timestamp time.Time
 	Endpoint  string
@@ -86,6 +86,7 @@ func percentileSorted(sorted []float64, q float64) float64 {
 	return sorted[idx]
 }
 
+// avg возвращает среднее значение
 func avg(xs []float64) float64 {
 	if len(xs) == 0 {
 		return 0

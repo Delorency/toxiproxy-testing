@@ -9,13 +9,15 @@ import (
 	"pr4/internal/config"
 )
 
+// ErrRateLimited возвращается, когда токенов нет
 var ErrRateLimited = errors.New("rate limited")
 
-// RateLimiter ограничивает частоту запросов (token bucket).
+// RateLimiter ограничивает частоту запросов (token bucket)
 type RateLimiter struct {
 	limiter *rate.Limiter
 }
 
+// NewRateLimiter создаёт новый лимитер
 func NewRateLimiter(cfg *config.RateLimiterConfig) *RateLimiter {
 	limit := rate.Limit(cfg.RPS)
 	if cfg.RPS <= 0 {
@@ -26,7 +28,7 @@ func NewRateLimiter(cfg *config.RateLimiterConfig) *RateLimiter {
 	}
 }
 
-// TryAcquire — неблокирующая попытка взять токен.
+// TryAcquire - неблокирующая попытка взять токен
 func (rl *RateLimiter) TryAcquire() error {
 	if !rl.limiter.Allow() {
 		return ErrRateLimited
@@ -34,12 +36,12 @@ func (rl *RateLimiter) TryAcquire() error {
 	return nil
 }
 
-// Wait — блокируется до получения токена или отмены ctx.
+// Wait блокируется до получения токена или отмены ctx
 func (rl *RateLimiter) Wait(ctx context.Context) error {
 	return rl.limiter.Wait(ctx)
 }
 
-// Reserve — узнать, сколько ждать, и решить самому.
+// Reserve позволяет узнать, сколько ждать, и решить самому
 func (rl *RateLimiter) Reserve() *rate.Reservation {
 	return rl.limiter.Reserve()
 }

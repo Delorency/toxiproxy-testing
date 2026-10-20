@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-// Scenario — JSON-сценарий эксперимента
+// Scenario - JSON-сценарий эксперимента
 type Scenario struct {
 	Name        string    `json:"name"`
 	ServerURL   string    `json:"server_url"`
@@ -17,7 +17,7 @@ type Scenario struct {
 	Steps       []Step    `json:"steps"`
 }
 
-// Step — шаг сценария
+// Step - шаг сценария
 type Step struct {
 	DurationS int    `json:"duration_s"`
 	RPS       int    `json:"rps"`
@@ -25,7 +25,7 @@ type Step struct {
 	Endpoint  string `json:"endpoint,omitempty"` // по умолчанию /fast
 }
 
-// Toxic — описание включаемого токсина
+// Toxic - описание включаемого токсина
 type Toxic struct {
 	Type      string `json:"type"` // latency | timeout | bandwidth | reset_peer | slow_close
 	LatencyMs int64  `json:"latency_ms,omitempty"`

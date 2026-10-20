@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// Config — параметры HTTP-сервера
+// Config - параметры HTTP-сервера
 type Config struct {
 	Host           string
 	Port           int
@@ -16,7 +16,7 @@ type Config struct {
 	DefaultErrorRt float64
 }
 
-// Server — HTTP-сервер с эндпоинтами разной тяжести
+// Server - HTTP-сервер с эндпоинтами разной тяжести
 type Server struct {
 	cfg     Config
 	httpSrv *http.Server
@@ -43,7 +43,7 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("/health", s.handleHealth)
 }
 
-// Handler возвращает http.Handler с middleware (в порядке применения)
+// Handler возвращает http.Handler с middleware, в порядке применения
 func (s *Server) Handler(mw ...Middleware) http.Handler {
 	var h http.Handler = s.mux
 	for i := len(mw) - 1; i >= 0; i-- {
@@ -133,7 +133,7 @@ func (s *Server) handleHeavy(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// handleHealth — для health-check
+// handleHealth для health-check
 func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }

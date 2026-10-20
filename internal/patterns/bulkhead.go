@@ -12,22 +12,22 @@ import (
 	"pr4/internal/config"
 )
 
-// ErrBulkheadFull возвращается, когда все слоты заняты (fail-fast)
+// ErrBulkheadFull возвращается, когда все слоты заняты
 var ErrBulkheadFull = errors.New("bulkhead is full")
 
 // ErrBulkheadPanic оборачивает панику внутри защищённой функции
 var ErrBulkheadPanic = errors.New("panic in bulkhead function")
 
 // Bulkhead ограничивает количество параллельных выполнений.
-// Реализует паттерн Bulkhead (Release It!): при переполнении — fail-fast,
-// не блокируется, чтобы не превратиться в очередь и не усугубить лавину.
+// При переполнении - fail-fast, не блокируется, чтобы не превратиться
+// в очередь и не усугубить лавину.
 type Bulkhead struct {
 	sem      *semaphore.Weighted
 	maxSize  int64
 	acquired int64
 }
 
-// NewBulkhead создает новый изолятор ресурсов
+// NewBulkhead создаёт новый изолятор ресурсов
 func NewBulkhead(cfg *config.BulkheadConfig) *Bulkhead {
 	maxConcurrent := cfg.MaxConcurrent
 	if maxConcurrent < 1 {
@@ -39,8 +39,9 @@ func NewBulkhead(cfg *config.BulkheadConfig) *Bulkhead {
 	}
 }
 
-// Execute — fail-fast версия: если нет свободного слота, сразу возвращает ErrBulkheadFull.
-// Не блокируется, поэтому не нуждается в ctx для ожидания.
+// Execute - fail-fast версия. Если нет свободного слота,
+// сразу возвращает ErrBulkheadFull. Не блокируется,
+// поэтому не нуждается в ctx для ожидания.
 func (b *Bulkhead) Execute(ctx context.Context, fn func() error) error {
 	if !b.sem.TryAcquire(1) {
 		return ErrBulkheadFull
@@ -48,8 +49,8 @@ func (b *Bulkhead) Execute(ctx context.Context, fn func() error) error {
 	return b.run(fn)
 }
 
-// ExecuteWithWait — ждёт свободный слот до отмены ctx.
-// Это уже не чистый Bulkhead, а worker pool — используйте осознанно.
+// ExecuteWithWait ждёт свободный слот до отмены ctx.
+// Это уже не чистый Bulkhead, а worker pool, используйте осознанно.
 func (b *Bulkhead) ExecuteWithWait(ctx context.Context, fn func() error) error {
 	if err := b.sem.Acquire(ctx, 1); err != nil {
 		return err // ctx.Err()
@@ -57,7 +58,7 @@ func (b *Bulkhead) ExecuteWithWait(ctx context.Context, fn func() error) error {
 	return b.run(fn)
 }
 
-// run — общая часть: слот уже захвачен, нужно его освободить
+// run - общая часть, слот уже захвачен, нужно его освободить
 func (b *Bulkhead) run(fn func() error) error {
 	defer b.sem.Release(1)
 
@@ -77,7 +78,7 @@ func (b *Bulkhead) run(fn func() error) error {
 	return err
 }
 
-// Available возвращает количество свободных слотов (приблизительно, снимок)
+// Available возвращает количество свободных слотов, приблизительно
 func (b *Bulkhead) Available() int64 {
 	val := b.maxSize - atomic.LoadInt64(&b.acquired)
 	if val < 0 {
@@ -86,7 +87,7 @@ func (b *Bulkhead) Available() int64 {
 	return val
 }
 
-// InUse возвращает количество занятых слотов (приблизительно, снимок)
+// InUse возвращает количество занятых слотов, приблизительно
 func (b *Bulkhead) InUse() int64 {
 	return atomic.LoadInt64(&b.acquired)
 }

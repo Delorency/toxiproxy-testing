@@ -8,10 +8,10 @@ import (
 	"pr4/internal/config"
 )
 
-// ErrCircuitOpen возвращается когда выключатель разомкнут
+// ErrCircuitOpen возвращается, когда выключатель разомкнут
 var ErrCircuitOpen = errors.New("circuit breaker is open")
 
-// State представляет состояние автоматического выключателя
+// State - состояние автоматического выключателя
 type State int
 
 const (
@@ -33,7 +33,7 @@ type CircuitBreaker struct {
 	lastFailureTime  time.Time
 }
 
-// NewCircuitBreaker создает новый автоматический выключатель
+// NewCircuitBreaker создаёт новый автоматический выключатель
 func NewCircuitBreaker(cfg *config.CircuitBreakerConfig) *CircuitBreaker {
 	halfOpenSuccess := cfg.HalfOpenSuccess
 	if halfOpenSuccess < 1 {
@@ -55,7 +55,7 @@ func NewCircuitBreaker(cfg *config.CircuitBreakerConfig) *CircuitBreaker {
 
 // Call выполняет функцию под защитой выключателя.
 // Гарантирует, что результат будет записан даже при панике в fn,
-// чтобы halfOpenInFlight не «залип» в состоянии HalfOpen.
+// чтобы halfOpenInFlight не залип в состоянии HalfOpen.
 func (cb *CircuitBreaker) Call(fn func() error) (err error) {
 	if !cb.allowRequest() {
 		return ErrCircuitOpen
@@ -74,8 +74,8 @@ func (cb *CircuitBreaker) Call(fn func() error) (err error) {
 }
 
 // State возвращает текущее состояние выключателя,
-// при этом обновляя переход Open → HalfOpen по истечении таймаута.
-// Это важно для тестов и метрик: чтение состояния должно видеть
+// при этом обновляя переход Open -> HalfOpen по истечении таймаута.
+// Важно для тестов и метрик, чтобы чтение состояния видело
 // актуальную картину, а не устаревшую.
 func (cb *CircuitBreaker) State() State {
 	cb.mu.Lock()
@@ -98,7 +98,7 @@ func StateToString(s State) string {
 	}
 }
 
-// maybeHalfOpenLocked переводит Open → HalfOpen, если истёк таймаут.
+// maybeHalfOpenLocked переводит Open -> HalfOpen, если истёк таймаут.
 // Должен вызываться под удержанием cb.mu.
 func (cb *CircuitBreaker) maybeHalfOpenLocked() {
 	if cb.state == StateOpen && time.Since(cb.lastFailureTime) > cb.timeout {
@@ -108,7 +108,7 @@ func (cb *CircuitBreaker) maybeHalfOpenLocked() {
 	}
 }
 
-// allowRequest проверяет разрешён ли запрос
+// allowRequest проверяет, разрешён ли запрос
 func (cb *CircuitBreaker) allowRequest() bool {
 	cb.mu.Lock()
 	defer cb.mu.Unlock()

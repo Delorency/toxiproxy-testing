@@ -7,8 +7,8 @@ import (
 	"pr4/internal/config"
 )
 
-// Retry выполняет функцию с повторными попытками при ошибках
-// Использует экспоненциальную задержку между попытками
+// Retry выполняет функцию с повторными попытками при ошибках.
+// Использует экспоненциальную задержку между попытками.
 func Retry(ctx context.Context, cfg *config.RetryConfig, fn func() error) error {
 	delay := cfg.InitialDelay
 
@@ -22,7 +22,7 @@ func Retry(ctx context.Context, cfg *config.RetryConfig, fn func() error) error 
 			return err
 		}
 
-		// ждем перед следующей попыткой
+		// ждём перед следующей попыткой
 		select {
 		case <-ctx.Done():
 			return ctx.Err()

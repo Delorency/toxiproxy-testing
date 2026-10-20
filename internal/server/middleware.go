@@ -12,7 +12,7 @@ import (
 
 type Middleware func(http.Handler) http.Handler
 
-// Лимитер общий на весь сервер. Per-client вариант отдельная задача.
+// Лимитер общий на весь сервер. Per-client вариант - отдельная задача.
 func RateLimitMiddleware(rps int, burst int) Middleware {
 	limiter := rate.NewLimiter(rate.Limit(rps), burst)
 
@@ -27,8 +27,8 @@ func RateLimitMiddleware(rps int, burst int) Middleware {
 	}
 }
 
-// BulkheadMiddleware - ограничение параллелизма на сервере.
-// Ждёт освобождения слота не дольше waitTimeout, иначе 503.
+// Ограничивает число одновременных запросов на сервере.
+// Ждёт освобождения слота не дольше waitTimeout, иначе отдаёт 503.
 func BulkheadMiddleware(maxConcurrent int64, waitTimeout time.Duration) Middleware {
 	sem := semaphore.NewWeighted(maxConcurrent)
 
@@ -48,9 +48,8 @@ func BulkheadMiddleware(maxConcurrent int64, waitTimeout time.Duration) Middlewa
 	}
 }
 
-// TimeoutMiddleware - ограничение времени обработки.
-// Пробрасывает ctx с дедлайном вниз; если хендлер не успел записать
-// ответ — возвращает 504.
+// Ограничивает время обработки запроса. Пробрасывает ctx с дедлайном вниз,
+// если хендлер не успел записать ответ - отдаёт 504.
 func TimeoutMiddleware(timeout time.Duration) Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -76,7 +75,7 @@ func TimeoutMiddleware(timeout time.Duration) Middleware {
 	}
 }
 
-// statusWriter запоминает, был ли записан заголовок ответа.
+// Запоминает, был ли записан заголовок ответа.
 type statusWriter struct {
 	http.ResponseWriter
 	wroteHeader bool
@@ -97,17 +96,16 @@ func (sw *statusWriter) Write(b []byte) (int, error) {
 	return sw.ResponseWriter.Write(b)
 }
 
-// Counters — счётчики отказов по middleware.
+// Счётчики отказов по middleware.
 type Counters struct {
 	RateLimited  int64
 	BulkheadFull int64
 	Timeouts     int64
 }
 
-// NewCounters создаёт нулевые счётчики.
 func NewCounters() *Counters { return &Counters{} }
 
-// RateLimitMiddlewareWithCounter - RateLimitMiddleware со счётчиком отказов.
+// RateLimitMiddleware со счётчиком отказов.
 func RateLimitMiddlewareWithCounter(rps int, burst int, c *Counters) Middleware {
 	limiter := rate.NewLimiter(rate.Limit(rps), burst)
 	return func(next http.Handler) http.Handler {
@@ -122,7 +120,7 @@ func RateLimitMiddlewareWithCounter(rps int, burst int, c *Counters) Middleware 
 	}
 }
 
-// BulkheadMiddlewareWithCounter - BulkheadMiddleware со счётчиком отказов.
+// BulkheadMiddleware со счётчиком отказов.
 func BulkheadMiddlewareWithCounter(maxConcurrent int64, waitTimeout time.Duration, c *Counters) Middleware {
 	sem := semaphore.NewWeighted(maxConcurrent)
 	return func(next http.Handler) http.Handler {
