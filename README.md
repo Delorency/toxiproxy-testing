@@ -137,11 +137,10 @@ make down                        # остановить
 
 Пример CSV:
 
-```csv
-step,duration_s,rps,toxic,total,success,failed,retries,p50_ms,p95_ms,p99_ms,avg_ms,cb_closed,cb_open,cb_half_open
-1,5,30,-,150,150,0,0,10.0,20.0,30.0,15.0,150,0,0
-2,10,30,latency,300,250,50,10,200.0,300.0,400.0,250.0,250,50,0
-```
+| step | duration_s | rps | toxic | total | success | failed | retries | p50_ms | p95_ms | p99_ms | avg_ms | cb_closed | cb_open | cb_half_open |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 5 | 30 | - | 150 | 150 | 0 | 0 | 10.0 | 20.0 | 30.0 | 15.0 | 150 | 0 | 0 |
+| 2 | 10 | 30 | latency | 300 | 250 | 50 | 10 | 200.0 | 300.0 | 400.0 | 250.0 | 250 | 50 | 0 |
 
 ## Структура проекта
 
@@ -231,7 +230,7 @@ RUNNER_RESULTS_DIR=results
 RUNNER_FIXTURES_DIR=fixtures
 ```
 
-## Тезисы для доклада
+## Тезисы
 
 1. **Toxiproxy** — мощный инструмент для тестирования отказоустойчивости.
 2. **Паттерны защиты** — важный инструмент для повышения устойчивости приложений.
