@@ -1,0 +1,11 @@
+{
+  "name": "test_ratelimit",
+  "proxy_name": "test_ratelimit",
+  "server_url": "http://host.docker.internal:8080",
+  "warmup_s": 2,
+  "middlewares": ["ratelimit"],
+  "steps": [
+    { "duration_s": 5, "rps": 30, "endpoint": "/fast", "toxic": null },
+    { "duration_s": 10, "rps": 200, "endpoint": "/fast", "toxic": { "type": "latency", "latency_ms": 100 } }
+  ]
+}

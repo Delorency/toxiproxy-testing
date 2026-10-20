@@ -1,0 +1,12 @@
+{
+  "name": "test_cb",
+  "proxy_name": "test_cb",
+  "server_url": "http://host.docker.internal:8080",
+  "warmup_s": 2,
+  "middlewares": ["circuitbreaker"],
+  "steps": [
+    { "duration_s": 5, "rps": 30, "endpoint": "/fast", "toxic": null },
+    { "duration_s": 10, "rps": 30, "endpoint": "/fast", "toxic": { "type": "reset_peer", "timeout_ms": 0 } },
+    { "duration_s": 10, "rps": 30, "endpoint": "/fast", "toxic": null }
+  ]
+}

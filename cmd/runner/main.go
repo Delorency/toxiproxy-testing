@@ -24,5 +24,5 @@ func main() {
 		log.Fatalf("runner error: %v", err)
 	}
 
-	log.Printf("done. results saved to: %s", outPath)
+	log.Printf("results saved to: %s", outPath)
 }

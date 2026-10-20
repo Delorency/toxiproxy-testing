@@ -1,0 +1,11 @@
+{
+  "name": "test_timeout",
+  "proxy_name": "test_timeout",
+  "server_url": "http://host.docker.internal:8080",
+  "warmup_s": 2,
+  "middlewares": ["timeout"],
+  "steps": [
+    { "duration_s": 5, "rps": 30, "endpoint": "/fast", "toxic": null },
+    { "duration_s": 10, "rps": 30, "endpoint": "/fast", "toxic": { "type": "latency", "latency_ms": 2000, "jitter_ms": 1000 } }
+  ]
+}

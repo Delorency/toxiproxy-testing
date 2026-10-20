@@ -14,6 +14,7 @@ import (
 
 	"pr4/internal/client"
 	"pr4/internal/config"
+	"pr4/internal/patterns"
 	"pr4/internal/toxiproxy"
 )
 
@@ -40,7 +41,7 @@ func (r *Runner) Run(scenarioPath string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 	defer cancel()
 
-	// upstream для Toxiproxy — без схемы
+	// upstream для Toxiproxy - без схемы
 	upstream := trimScheme(sc.ServerURL)
 	log.Printf("upstream for toxiproxy: %s", upstream)
 
@@ -59,21 +60,29 @@ func (r *Runner) Run(scenarioPath string) (string, error) {
 	}
 	log.Printf("client will connect to: %s", clientBaseURL)
 
-	// канал метрик — общий на весь сценарий
+	// канал метрик
 	metricsCh := make(chan client.RequestMetrics, 200000)
 
-	// создаём клиент
-	c := client.New(
-		clientBaseURL,
-		r.cfg.Bulkhead,
-		r.cfg.RateLimiter,
-		r.cfg.CircuitBreaker,
-		r.cfg.Retry,
-		r.cfg.Timeout,
-		metricsCh,
-	)
+	bh := patterns.NewBulkhead(r.cfg.Bulkhead)
+	rl := patterns.NewRateLimiter(r.cfg.RateLimiter)
+	cb := patterns.NewCircuitBreaker(r.cfg.CircuitBreaker)
 
-	// прогрев — метрики после него сбрасываем, чтобы не попали в первый шаг
+	deps := &client.MiddlewareDeps{
+		Bulkhead:       bh,
+		RateLimiter:    rl,
+		CircuitBreaker: cb,
+		RetryCfg:       r.cfg.Retry,
+		TimeoutCfg:     r.cfg.Timeout,
+	}
+
+	mw, err := client.BuildMiddlewares(*sc.Middlewares, deps)
+	if err != nil {
+		return "", fmt.Errorf("build middlewares: %w", err)
+	}
+
+	c := client.New(clientBaseURL, metricsCh, mw...)
+	c.SetCB(cb)
+
 	if sc.WarmupS > 0 {
 		log.Printf("warmup %ds...", sc.WarmupS)
 		_ = RunLoad(ctx, c, 20, time.Duration(sc.WarmupS)*time.Second, "/fast", metricsCh)
@@ -118,8 +127,6 @@ func (r *Runner) Run(scenarioPath string) (string, error) {
 				snap.P50Ms, snap.P95Ms, snap.P99Ms,
 				snap.CBStateClosed, snap.CBStateOpen, snap.CBStateHalfOpen)
 		}()
-
-		// чистим канал от «хвостов» предыдущего шага
 		drainMetrics(metricsCh)
 	}
 
@@ -127,7 +134,10 @@ func (r *Runner) Run(scenarioPath string) (string, error) {
 	if err := os.MkdirAll(r.cfg.Runner.ResultsDir, 0o755); err != nil {
 		return "", fmt.Errorf("mkdir results: %w", err)
 	}
-	outPath := filepath.Join(r.cfg.Runner.ResultsDir, sc.Name+".csv")
+
+	timestamp := time.Now().Format("20060102_150405")
+	outPath := filepath.Join(r.cfg.Runner.ResultsDir, sc.Name+"_"+timestamp+".csv")
+
 	if err := writeCSV(outPath, results); err != nil {
 		return "", fmt.Errorf("write csv: %w", err)
 	}
@@ -135,7 +145,6 @@ func (r *Runner) Run(scenarioPath string) (string, error) {
 	return outPath, nil
 }
 
-// StepResult — результат шага
 type StepResult struct {
 	Step      int
 	DurationS int

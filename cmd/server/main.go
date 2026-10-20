@@ -22,7 +22,7 @@ func main() {
 		DefaultErrorRt: cfg.Server.DefaultErrorRt,
 	})
 
-	// при желании включаем middleware на сервере через SERVER_MIDDLEWARE=true
+	// SERVER_MIDDLEWARE=true/false
 	var mw []server.Middleware
 	if cfg.Server.Middleware {
 		mw = append(mw,

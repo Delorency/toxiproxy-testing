@@ -1,32 +1,13 @@
 {
   "name": "stepwise_degradation",
-  "server_url": "http://host.docker.internal:8080",
   "proxy_name": "client_to_server",
+  "server_url": "http://host.docker.internal:8080",
   "warmup_s": 3,
+  "middlewares": ["bulkhead", "ratelimit", "circuitbreaker", "retry", "timeout"],
   "steps": [
-    {
-      "duration_s": 10,
-      "rps": 50,
-      "endpoint": "/fast",
-      "toxic": null
-    },
-    {
-      "duration_s": 20,
-      "rps": 50,
-      "endpoint": "/fast",
-      "toxic": { "type": "latency", "latency_ms": 500, "jitter_ms": 50 }
-    },
-    {
-      "duration_s": 20,
-      "rps": 50,
-      "endpoint": "/fast",
-      "toxic": { "type": "latency", "latency_ms": 2000 }
-    },
-    {
-      "duration_s": 20,
-      "rps": 50,
-      "endpoint": "/fast",
-      "toxic": null
-    }
+    { "duration_s": 10, "rps": 50, "endpoint": "/fast", "toxic": null },
+    { "duration_s": 20, "rps": 50, "endpoint": "/fast", "toxic": { "type": "latency", "latency_ms": 500, "jitter_ms": 50 } },
+    { "duration_s": 20, "rps": 50, "endpoint": "/fast", "toxic": { "type": "latency", "latency_ms": 2000 } },
+    { "duration_s": 20, "rps": 50, "endpoint": "/fast", "toxic": null }
   ]
 }

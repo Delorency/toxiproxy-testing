@@ -1,0 +1,12 @@
+{
+  "name": "server_overload",
+  "proxy_name": "overload",
+  "server_url": "http://host.docker.internal:8080",
+  "warmup_s": 3,
+  "middlewares": [],
+  "steps": [
+    { "duration_s": 10, "rps": 400, "endpoint": "/fast", "toxic": null },
+    { "duration_s": 10, "rps": 400, "endpoint": "/slow?delay=1s", "toxic": null },
+    { "duration_s": 10, "rps": 400, "endpoint": "/slow?delay=3s", "toxic": null }
+  ]
+}

@@ -9,11 +9,12 @@ import (
 
 // Scenario — JSON-сценарий эксперимента
 type Scenario struct {
-	Name      string `json:"name"`
-	ServerURL string `json:"server_url"`
-	ProxyName string `json:"proxy_name"` // имя прокси в Toxiproxy
-	WarmupS   int    `json:"warmup_s"`   // прогрев перед шагами (без сбора метрик)
-	Steps     []Step `json:"steps"`
+	Name        string    `json:"name"`
+	ServerURL   string    `json:"server_url"`
+	ProxyName   string    `json:"proxy_name"`
+	WarmupS     int       `json:"warmup_s"`
+	Middlewares *[]string `json:"middlewares,omitempty"`
+	Steps       []Step    `json:"steps"`
 }
 
 // Step — шаг сценария
@@ -62,6 +63,11 @@ func LoadScenario(path string) (*Scenario, error) {
 		if s.Steps[i].RPS == 0 {
 			s.Steps[i].RPS = 50
 		}
+	}
+
+	if s.Middlewares == nil {
+		defaultMW := []string{"bulkhead", "ratelimit", "circuitbreaker", "retry", "timeout"}
+		s.Middlewares = &defaultMW
 	}
 
 	return &s, nil

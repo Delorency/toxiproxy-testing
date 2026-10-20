@@ -12,7 +12,7 @@ import (
 
 type Middleware func(http.Handler) http.Handler
 
-// Лимитер общий на весь сервер. Per-client вариант — отдельная задача.
+// Лимитер общий на весь сервер. Per-client вариант отдельная задача.
 func RateLimitMiddleware(rps int, burst int) Middleware {
 	limiter := rate.NewLimiter(rate.Limit(rps), burst)
 
@@ -27,7 +27,7 @@ func RateLimitMiddleware(rps int, burst int) Middleware {
 	}
 }
 
-// BulkheadMiddleware — ограничение параллелизма на сервере.
+// BulkheadMiddleware - ограничение параллелизма на сервере.
 // Ждёт освобождения слота не дольше waitTimeout, иначе 503.
 func BulkheadMiddleware(maxConcurrent int64, waitTimeout time.Duration) Middleware {
 	sem := semaphore.NewWeighted(maxConcurrent)
@@ -48,7 +48,7 @@ func BulkheadMiddleware(maxConcurrent int64, waitTimeout time.Duration) Middlewa
 	}
 }
 
-// TimeoutMiddleware — ограничение времени обработки.
+// TimeoutMiddleware - ограничение времени обработки.
 // Пробрасывает ctx с дедлайном вниз; если хендлер не успел записать
 // ответ — возвращает 504.
 func TimeoutMiddleware(timeout time.Duration) Middleware {
@@ -107,7 +107,7 @@ type Counters struct {
 // NewCounters создаёт нулевые счётчики.
 func NewCounters() *Counters { return &Counters{} }
 
-// RateLimitMiddlewareWithCounter — RateLimitMiddleware со счётчиком отказов.
+// RateLimitMiddlewareWithCounter - RateLimitMiddleware со счётчиком отказов.
 func RateLimitMiddlewareWithCounter(rps int, burst int, c *Counters) Middleware {
 	limiter := rate.NewLimiter(rate.Limit(rps), burst)
 	return func(next http.Handler) http.Handler {
@@ -122,7 +122,7 @@ func RateLimitMiddlewareWithCounter(rps int, burst int, c *Counters) Middleware 
 	}
 }
 
-// BulkheadMiddlewareWithCounter — BulkheadMiddleware со счётчиком отказов.
+// BulkheadMiddlewareWithCounter - BulkheadMiddleware со счётчиком отказов.
 func BulkheadMiddlewareWithCounter(maxConcurrent int64, waitTimeout time.Duration, c *Counters) Middleware {
 	sem := semaphore.NewWeighted(maxConcurrent)
 	return func(next http.Handler) http.Handler {

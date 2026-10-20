@@ -16,7 +16,7 @@ type RequestMetrics struct {
 	Err       string // текст ошибки, если была
 }
 
-// Snapshot — агрегированные метрики за период
+// Snapshot - агрегированные метрики за период
 type Snapshot struct {
 	Total   int
 	Success int
