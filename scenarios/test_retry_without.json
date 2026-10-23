@@ -1,0 +1,11 @@
+{
+  "name": "test_retry_without",
+  "proxy_name": "test_retry_without",
+  "server_url": "http://host.docker.internal:8080",
+  "warmup_s": 2,
+  "middlewares": [],
+  "steps": [
+    { "duration_s": 5, "rps": 30, "endpoint": "/fast", "toxic": null },
+    { "duration_s": 10, "rps": 30, "endpoint": "/random?error_rate=0.5", "toxic": null }
+  ]
+}
