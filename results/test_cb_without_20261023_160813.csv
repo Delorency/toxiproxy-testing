@@ -1,0 +1,4 @@
+step,duration_s,rps,toxic,total,success,failed,retries,p50_ms,p95_ms,p99_ms,avg_ms,cb_closed,cb_open,cb_half_open
+1,5,30,-,150,150,0,0,8.0,75.0,109.0,15.1,150,0,0
+2,10,30,reset_peer,299,0,299,0,28.0,145.0,280.0,39.5,299,0,0
+3,10,30,-,300,300,0,0,7.0,13.0,31.0,7.5,300,0,0
